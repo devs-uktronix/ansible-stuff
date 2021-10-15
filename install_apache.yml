@@ -4,23 +4,25 @@
   become: true
   tasks:
 
+  - name: install apache2 and php packages
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
 
   - name: update repository index
-    apt:
+    dnf:
       update_cache: yes
+    when: ansible_distribution == "AlmaLinux"
 
-  - name: install apache2 package
-    apt:
-      name: apache2
+  - name: install httpd and php packages
+    dnf:
+      name: 
+        - httpd
+        - php
       state: latest
-
-  - name: add php support for apache2
-    apt:
-      name: libapache2-mod-php
-      state: latest
-
-
-  # - name: remove java repo
-  #   ansible.builtin.file:
-  #     path: '/etc/apt/sources.list.d/webupd8team-ubuntu-java-focal.list'
-  #     state: absent
+      update_cache: yes
+    when: ansible_distribution == "AlmaLinux"
