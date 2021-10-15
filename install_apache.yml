@@ -1,0 +1,26 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+
+  - name: update repository index
+    apt:
+      update_cache: yes
+
+  - name: install apache2 package
+    apt:
+      name: apache2
+      state: latest
+
+  - name: add php support for apache2
+    apt:
+      name: libapache2-mod-php
+      state: latest
+
+
+  # - name: remove java repo
+  #   ansible.builtin.file:
+  #     path: '/etc/apt/sources.list.d/webupd8team-ubuntu-java-focal.list'
+  #     state: absent
