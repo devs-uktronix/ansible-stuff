@@ -2,98 +2,48 @@
 
 - hosts: all
   become: true
-  tasks:
+  pre_tasks:
 
-  - name: install updates (Alma)
+  - name: updates repository index (AlmaLinux)
     tags: always
     dnf:
       update_only: yes
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == "AlmaLinux"
     
-  - name: install updates (Ubuntu)
+  - name: updates repository index (Ubuntu)
     apt:
       upgrade: dist
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == "Ubuntu"
 
+- hosts: all
+  become: yes
+  roles:
+    - base
 
+- hosts: workstations
+  tags: mac,laptop
+  become: true
+  roles:
+    - workstations
 
 - hosts: web_servers
-  tags: apache, apache2, ubuntu
+  tags: mac,laptop
   become: true
-  tasks:
-
-  - name: install apache2 and php packages
-    apt:
-      name: 
-        - apache2
-        - libapache2-mod-php
-      state: latest
-    when: ansible_distribution == "Ubuntu"
-
-  - name: install httpd and php packages
-    tags: httpd, AlmaLinux
-    dnf:
-      name: 
-        - httpd
-        - php
-      state: latest
-    when: ansible_distribution == "AlmaLinux"
-
-  - hosts: workstation
-    become: yes
-    tags: mac,laptop
-    tasks:
-
-    - name: install unzip
-      package:
-        name: unzip
-    
-    - name: install terraform
-      unarchive:
-        src: https://releases.hashicorp.com/terraform/1.0.9/terraform_1.0.9_darwin_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-        mode: 0755
-        owner: redwan
-        group: redwan
-
-  - name: copy default page
-    tags: apache,apache2,httpd
-    copy: 
-      src: default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
-      
-
+  roles:
+    - web_servers
 
 - hosts: db_servers
-  tags: mariadb, db, AlmaLinux
+  tags: mac,laptop
   become: true
-  tasks:
-
-  - name: install mariadb package (Ubuntu)
-    apt:
-      name: mariadb-server
-      state: present
-    when: ansible_distribution == "Ubuntu"
-
-  - name: install mariadb package (AlmaLinux)
-    dnf:
-      name: mariadb
-      state: present
-    when: ansible_distribution == "AlmaLinux"
+  roles:
+    - db_servers
 
 - hosts: file_servers
+  tags: mac,laptop
   become: true
-  tags: samba
-  tasks:
-    - name: install samba package
-      package:
-        name: samba
-        state: latest
-
-
+  roles:
+    - file_servers

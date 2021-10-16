@@ -1,0 +1,36 @@
+  - name: updates repo cache (Alma)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "AlmaLinux"
+    
+  - name: updates repo cache (Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    changed_when: false
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install vim
+    package:
+      name: vim
+
+  - name: add user
+    user:
+      name: roberta
+      groups: root
+
+  - name: add ssh key for roberta
+    authorized_key:
+      user: roberta
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKofmc1e0vyJJ7WyI7qYxL5XsplGvHTKBJ2QbKYVGUcw ansible-local"
+
+  - name: add sudoers file for roberta
+    copy:
+     src: sudoer_roberta
+     dest: /etc/sudoers.d/robeta
+     owner: root
+     group: root
+     mode: 0440
