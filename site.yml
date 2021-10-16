@@ -33,12 +33,41 @@
     when: ansible_distribution == "Ubuntu"
 
   - name: install httpd and php packages
+    tags: httpd, AlmaLinux
     dnf:
       name: 
         - httpd
         - php
       state: latest
     when: ansible_distribution == "AlmaLinux"
+
+  - hosts: workstation
+    become: yes
+    tags: mac,laptop
+    tasks:
+
+    - name: install unzip
+      package:
+        name: unzip
+    
+    - name: install terraform
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/1.0.9/terraform_1.0.9_darwin_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: 0755
+        owner: redwan
+        group: redwan
+
+  - name: copy default page
+    tags: apache,apache2,httpd
+    copy: 
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+      
 
 
 - hosts: db_servers
