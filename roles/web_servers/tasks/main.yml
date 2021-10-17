@@ -1,24 +1,18 @@
-- name: install apache2 and php packages
-  apt:
+- name: install "{{ apache_package_name }}" and "{{ php_package_name }}"
+  tags: apache,httpd,php
+  package:
     name: 
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution == "Ubuntu"
-- name: install httpd and php packages
-  tags: httpd, AlmaLinux
-  dnf:
-    name: 
-      - httpd
-      - php
-    state: latest
-  when: ansible_distribution == "AlmaLinux"
+
 - name: Start httpd (AlmaLinux)
+  tags: httpd,php
   service:
-    name: httpd
+    name: "{{ apache_service }}"
     state: started
     enabled: yes
-  when: ansible_distribution == "AlmaLinux"
+
 - name: copy default page
   tags: apache,apache2,httpd
   copy: 
@@ -27,16 +21,12 @@
     owner: root
     group: root
     mode: 0644
+
 - name: change email address
   lineinfile: 
     path: /etc/httpd/conf/httpd.conf
     regexp: '^ServerAdmin'
-    line: ServerAdmin redwan@example.com
+    line: ServerAdmin redwan@example.net
   when: ansible_distribution == 'AlmaLinux'
-  register: httpd
-- name: restart httpd
-  tags: httpd, AkmaLinux, apache
-  service:
-    name: httpd
-    state: restart
-  when: httpd.changed
+  notify: restart_apache
+
