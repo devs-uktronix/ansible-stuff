@@ -1,0 +1,10 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Hello') {
+      steps {
+        ansiblePlaybook become: true, becomeUser: 'redwan', credentialsId: '24593d7b-6b33-4f56-8bc1-803b2bd0f98e', playbook: '', vaultCredentialsId: 'Jenkins_GitHub_Connection'      }
+    }
+  }
+}
